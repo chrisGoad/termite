@@ -1,0 +1,42 @@
+<html>
+<head>
+<title>termite</title>
+<link rel="stylesheet" type="text/css"  href="/styles.css"/> 
+
+<body>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js"></script> 
+<script src="/geom2d.js"></script>
+<script src="/chart.js"></script>
+<script>
+
+var theChart;
+
+ $(document).ready(function () {
+    var ch0 = $('#chart0');
+    var cnvc = $('#chart0 .captions');
+    var cnv = $('#chart0 canvas');
+    //var cnvc = $('#chart0Container.captions');
+    var ch = new chartlib.Chart();
+    theChart = ch;
+    ch.init({canvas:cnv,captionDiv:cnvc,xbounds:new geom.Bounds(300,500)});
+    var pnts = geom.arrayToPoints([[310,100],[350,125],[400,110],[490,145]]);
+    var gr = new chartlib.Graph({chart:ch,ybounds:new geom.Bounds(95,150),style:"red",lineWidth:10});
+    var cap = new chartlib.Caption({graph:gr,text:"TEST CAPTION"});
+    gr.caption = cap;
+    gr.points = pnts;
+    gr.draw();
+    
+    //var tdpy = $("#theTerm");
+    //var jqe = t0.toJQ(tdpy);
+  });
+  
+
+</script>
+<div class="titleBar">Termite</div>
+<div class="topButtons"></div>
+<div class="stages" id="stages"></div>
+<div id="chart0">
+  <div class="captions">Captions</div>
+    <canvas style="border:solid thin black" width="400" height="100">HOOB</canvas>
+</body>
+</html>
