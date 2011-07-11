@@ -188,7 +188,7 @@ lib.Chart.prototype.draw = function () {
 
 chartc.Caption.prototype.toChart = function (gr) {
   var rs = new lib.Caption(this.options);
-  rs.text = this.options.caption;
+  rs.text = this.options.text;
   rs.graph = gr;
   return rs;  
 }
@@ -197,8 +197,8 @@ chartc.Graph.prototype.toChart = function (ch) {
   var o = this.options;
   var color = o.color;
   var lw = o.linewidth;
-  var dt = o.data;
-  var dtv = data[dt];
+  var dtv = o.data;
+  //var dtv = data[dt];
   var yb = new geom.Bounds(95,150);
   var gr = new chartlib.Graph({chart:ch,ybounds:yb,style:color,lineWidth:lw});
   gr.curve = dtv;

@@ -72,7 +72,7 @@ lib.Constant.prototype.map2 = function (trm,fn) {
 
 lib.Constant.prototype.mapr = function (fn) {
   var rs = fn(this);
-  if (rs == this) return new lib.Constant(this.value);
+  if (rs == this) return new lib.Constant(this.value,this.type);
   return rs;
 }
 

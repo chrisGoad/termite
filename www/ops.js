@@ -122,9 +122,7 @@ lib.TDict.prototype.filter  = function (props) {
   var rs = {};
   for (var k in d) {
     if (pd[k]) {
-      var dk = d[k];
-      var dkp = dk.path();
-      
+      var dk = d[k];      
       var dkc= dk.deepCopy();      
       rs[k] = dkc;
     }
@@ -138,9 +136,15 @@ lib.TDict.prototype.filter  = function (props) {
 lib.opdef.mkCGraph = new lib.TFun(
   "mkCGraph",
   function (o) {
-    var c = lib.op.Caption(o.filter(["caption","color"]));
+    var cop = o.filter(["color"]);
+    var d = o.dict;
+    var dt = d.data; // assumption; this is a constant = may be violated later - todo (don't allow execution if not constant)
+    var cpc = new lib.Constant(dt.value);
+    cpc.predecessor = dt;
+    cop.setProperty("text",cpc);
+    var cap = lib.op.Caption(cop);
     var g = lib.op.Graph(o.filter(["linewidth","color","data"]))
-    return lib.op.CGraph(lib.lift({caption:c,graph:g}));
+    return lib.op.CGraph(lib.lift({caption:cap,graph:g}));
   },
   function (o) {return true;} 
 );

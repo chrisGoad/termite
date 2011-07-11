@@ -86,14 +86,24 @@ lib.Constant = function (v,tp) {
 
 lib.Constant.prototype = new lib.Term(lib.Constant);
 
+lib.Constant.copy = function () {
+  return new lib.Constant(this.value,this.type);
+}
 
 lib.TDict = function (vl) {
   this.dict = vl;
+  var isConstant = true;
   for (k in vl) {
     var cc = vl[k];
     cc.parent = this;
+    if (!cc.isConstant) {
+      isConstant = false;
+    }
   }
+  this.isConstant = isConstant;
 }
+
+
 /* Now do this in lift
   var nvl = {}
   var isConstant = true;
@@ -121,7 +131,12 @@ lib.TDict = function (vl) {
 
 lib.TDict.prototype = new lib.Term(lib.TDict);
 
-
+// assumes v is already an unentangled Term
+lib.TDict.prototype.setProperty = function (p,v) {
+  var d = this.dict;
+  d[p] = v;
+  v.parent = this;
+}
 
 
 lib.TArray = function (vl) {

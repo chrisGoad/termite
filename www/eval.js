@@ -103,6 +103,14 @@ lib.Variable.prototype.value = function () {
 
 
 lib.Constant.prototype.constantValue = function () {
+  var tp = this.type;
+  if (tp) {
+    // in the case of an enumerated type, the value in the constant is the name of that member of the enumeration
+    var vls = tp.values;
+    if (vls) {
+      return vls[this.value]
+    }
+  }
   return this.value;
 }
 
@@ -221,15 +229,18 @@ lib.Application.prototype.evalOp = function () {
 
 
 
-
 lib.Term.prototype.applyModification  = function (mod,fromOp) {
   if (mod.kind == "replace") {
-    var nv = new lib.Constant(mod.newValue);
+    var mnv = mod.newValue;
+    // copy it
+    var nv = new lib.Constant(mnv.value,mnv.type);
     nv.predecessor = fromOp;
     return this.replaceToRoot(nv);
   }
   lib.error("Cannot apply modification to this kind of term");
 }
+
+
 
 lib.Application.prototype.applyModification = function (mod) {
   if (mod.kind == "apply") {
