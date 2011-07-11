@@ -3,14 +3,26 @@ var lib = tu;
 
 
 //idempotent
-lib.quote = function (v) {
+//{"v":v,"t":t} represents a value of type t
+
+lib.typedConstant = function (x) {
+  if (x && (typeof x == "object") && (x["v"] !== undefined) && x["t"]) {
+    return new lib.Constant(x["v"],x["t"]);
+  }
+}
+
+lib.quote = function (v,typ) {
   if (lib.isTerm(v)) return v;
-  if (!v) return new lib.Constant(v);
-  var tp = typeof v;
-  if (tp == "object") {
+  if (!v) return new lib.Constant(v,tp);
+  var vtp = typeof v;
+  if (!typ) {
+    var rs = lib.typedConstant(v);
+    if (rs) return rs;
+  }
+  if (vtp == "object") {
     lib.error("Can only quote literals")
   }
-  return new lib.Constant(v);
+  return new lib.Constant(v,typ);
   
 }
 
@@ -37,6 +49,8 @@ lib.lift = function (v) {
     return lib.quote(v);
   }
   if (tp == "object") {
+    var rs = lib.typedConstant(v);
+    if (rs) return rs;
     return lib.liftDict(v);
   }
   lib.error("Unexpected");

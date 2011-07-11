@@ -8,6 +8,7 @@
 <script src="/geom2d.js"></script>
 <script src="/constructors.js"></script>
 <script src="/util.js"></script>
+<script src="/type.js"></script>
 <script src="/map.js"></script>
 <script src="/path.js"></script>
 <script src="/replace.js"></script>
@@ -64,31 +65,33 @@
   
 
 </script>
-<div class="titleBar">Term-ite: a computation meta-editor</div>
+<div class="titleBar">Term-ite: a computation editor</div>
 
 <div class="intro">
+ 
+ <p><i>This page is under construction (as web pages in the 90's used to say so frequently)</i></p>
  
 <p>The end points of a computation (the code and its result)  are more often   open to inspection and modification than the process itself.
 But suppose that you could edit the process, intervening  at chosen points to produce a different result?
 If the computation took the form of moving from abstract to concrete representations, or of 
- replicating and then instantiating patterns (perhaps through several levels of instantiation), 
-then this would allow the end result to be manipulated at varying levels of abstraction or specificity.
+ replicating and then instantiating patterns (perhaps through several levels), 
+then this would allow the end result to be modified at varying levels of abstraction or specificity.
 
 </p>
 
 
 <p>This page exhibits  a primitive illustration of this idea, in which a bare-bones  user interface 
-is provided for inspecting and editing a simple computational process.  The mechansim that underlies the example is 
-a meta-calculator of sorts. It is a bit of software, dubbed "termulator", that implements operations that apply not at the level
-of data, but at the level of programmatic fragments - terms.  A computational process is represented by a sequence of terms,
+is provided for inspecting and editing a simple computational process.  The software that implements the example, "termite",
+is so named because it operates at the level of programmatic fragments - terms - rather than at the level of data.  A computational process is represented by a sequence of terms,
 connected by atomic operations, such as evaluating a function application.  In this sense a computation is a path through
-term space, and termulator a facility for editing such paths.  </p>  <!-- Other uses of this kind of UI-driven meta-calculation-->
+term space, and termite a facility for editing such paths.  </p>  <!-- Other uses of this kind of UI-driven meta-calculation-->
 
 <p>Enough blabber. Try it! </p>
 
 <p>The example involves graphing a series of curves on the same background chart. In its initial state, the curve sample1 is drawn twice. </p>
 
-<p>Click on the examples A,B,C to see a few complete computation path. Or edit your own. Basic instructions: the single-arrow keys < and > move the computation forward or backwards by one step.
+<p>Click on the examples A,B,C to see a few complete computation paths, with edits. You can add your own edits, either to the examples,
+or to the unmodified computation which results from hitting the ">>" button. Basic instructions: the single-arrow keys < and > move the computation forward or backwards by one step.
 The double arrows move to the beginning or end of the computation.  At each stage, any constant can be edited by
 clicking on the constant; changes will be propogated through the remaining steps. 
 </div>

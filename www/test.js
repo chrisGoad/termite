@@ -123,8 +123,9 @@ data.sample3 = geom.arrayToPWL([[310,100],[400,100],[410,147],[490,142]]);
 
 
 function test4() {
+  var color = lib.types.color;
   var colorv = new lib.Variable("color");
-  var o = lib.lift({"color":"red",linewidth:4,"caption":"hello","data":"sample1"});
+  var o = lib.lift({"color":{"v":"red","t":color},linewidth:4,"caption":"hello","data":"sample1"});
   //var caption = lib.op.Caption(o);
   //var chartv = new lib.Variable("chartOptions");
   //var xt = lib.ops.extend(chartv,lib.lift({"color":colorv,"data":"()"}));

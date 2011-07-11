@@ -62,19 +62,26 @@ lib.Let.prototype = new lib.Term(lib.Let);
 
 
 
-lib.Variable = function (name) {
+lib.Variable = function (name,tp) {
   this.name = name;
+  this.type = tp;
   this.isConstant = false;
 }
 
 lib.Variable.prototype = new lib.Term(lib.Variable);
 
 
+lib.Type = function (name) {
+  // other properties: editor (a jq element); cb_installer
+  this.name = name;
+}
 
 
-lib.Constant = function (v) {
+lib.Constant = function (v,tp) {
   this.value = v;
   this.isConstant = true;
+  if (!tp) tp = lib.types.any;
+  this.type = tp;
 }
 
 lib.Constant.prototype = new lib.Term(lib.Constant);
@@ -82,6 +89,12 @@ lib.Constant.prototype = new lib.Term(lib.Constant);
 
 lib.TDict = function (vl) {
   this.dict = vl;
+  for (k in vl) {
+    var cc = vl[k];
+    cc.parent = this;
+  }
+}
+/* Now do this in lift
   var nvl = {}
   var isConstant = true;
   for (k in vl) {
@@ -104,6 +117,8 @@ lib.TDict = function (vl) {
   this.isConstant = isConstant;
   
 }
+*/
+
 lib.TDict.prototype = new lib.Term(lib.TDict);
 
 

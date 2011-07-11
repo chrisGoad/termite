@@ -2,6 +2,8 @@
   var lib = tu;
 // op n connects stage n and stage n+1
 
+lib.editPanels = {}; //indexed by type
+
 lib.Highlight = function (cls,style) {
   this.cls = cls;
   this.style = style;
@@ -586,11 +588,11 @@ lib.displayStages = function () {
     lib.redisplay();   // lib.displayStages had problems ; @todo slightly more efficient; check on this    
   }
   
-  
 lib.EditPanel = function () {
 }
 
 lib.deactivateEditPanel = function () {
+  return; //fix
   if (!lib.theEditPanel.active) return;
   var trm = lib.theEditPanel.term;
   if (trm) trm.removeHighlight();
@@ -604,9 +606,9 @@ lib.deactivateEditPanel = function () {
 }
 
 
-  lib.EditPanel.prototype.performReplace = function () {
+  lib.performReplace = function (trm,vl) {
     //var inputeE = this.inputElement;
-    var dtr = this.dataRadios;
+   /* var dtr = this.dataRadios;
     var whichChecked = -1;
     for (var i=0;i<dtr.length;i++) {
       if (dtr[i].attr('checked')) whichChecked = i;
@@ -618,9 +620,10 @@ lib.deactivateEditPanel = function () {
     } else {
       vl = numvl;
     }
+   */
     var mod = lib.replace(vl);
-    var trm = this.term;
-    var stage = this.stage;
+    var rt = trm.root();
+    var stage = rt.stage;
     var path = trm.path();
     var op = new lib.Op(path,mod);
     lib.insertOp(stage,op);   
@@ -671,7 +674,8 @@ lib.deactivateEditPanel = function () {
     lib.insertOp(stage,op);
   }
 
-  lib.buildEditPanel = function () {
+  lib.buildEditPanel = function (type) {
+    var tname = type.name;
     var ecn =  $('<div class="editPanelContainer"> </div>');
     //lib.container.append(ecn);
     var edt = $('<span class="editPanel"></span>');
@@ -716,36 +720,97 @@ lib.deactivateEditPanel = function () {
     rs.cancelButton = cancelBut;
     rs.dataRadios = dataRs;
     exb.hide();
-    lib.theEditPanel = rs;
+    lib.editPanels[tname] = rs;
   }
   
+  
+  
+  
+  lib.buildColorEditPanel = function () {
+    var ecn =  $('<div class="editPanelContainer"> </div>');
+    //lib.container.append(ecn);
+    var edt = $('<span class="editPanel"></span>');
+    ecn.append(edt);
+
+    edt.append('<span> Replace with:</span>');
+    var dataRadio = $('<span/>');
+    var dataRs = [];
+    function dtr(cl) {
+      var rs = $('<input type="radio" name = "data" value="'+cl+'"></input>');
+      var rcn = $('<span style="color:'+cl+'">'+cl+'</span>');
+      dataRadio.append(rcn);
+      rcn.append(rs);
+      dataRs[cl] = rs;
+    }
+    edt.append(dataRadio);
+    
+    dtr("red");dtr("green");dtr("magenta");dtr("pink");
+   
+    var replaceBut = $('<input type="button" value="Replace"></input>');
+    edt.append(replaceBut);
+     var cancelBut = $('<input type="button" value="Cancel"></input>');
+    edt.append(cancelBut);
+
+    var rs = new lib.EditPanel();
+    rs.jq = edt;
+    rs.containerJQ = ecn;
+    rs.replaceButton = replaceBut;
+    rs.cancelButton = cancelBut;
+    rs.dataRadios = dataRs;
+    function nowChecked() {
+      for (k in dataRs) {
+        if (dataRs[k].attr("checked")) return k;
+      }
+    }
+  
+    rs.installCallbacks = function () {
+      replaceBut.click(function () {
+        var ch = nowChecked();
+        var rr = rs; //debugging
+        lib.performReplace(rs.term,ch);
+        
+      });
+    }
+    lib.editPanels['color'] = rs;
+  }
+
+
   
 lib.popEditPanel = function (trm) {
   /*
   pop the panel just after the given stage */
-  
-  var ep = lib.theEditPanel;
+  var ep = null;
+  if (trm.kind == lib.Constant) {
+    var tp = trm.type;
+    if (tp) {
+      var ep = lib.editPanels[tp.name];
+    }
+  }
+  if (!ep) {
+    ep = lib.editPanels["any"];
+  }
   if (ep.active) {
     ep.term.removeHighlight();
   }
   var k = trm.kind;
-  if (k == lib.Application  && (trm.check()==true)) {
-    ep.applyButton.show();
+  if (k == lib.Application) {
+    if (trm.check()==true) {
+      ep.applyButton.show();
     
-    ep.applyButton.click(function () {
-      ep.performApply();
-    });
-  } else {
-    ep.applyButton.hide();
+      ep.applyButton.click(function () {
+        ep.performApply();
+      });
+    } else {
+      ep.applyButton.hide();
+    }
   }
   if (trm.evalTarget()) {
     ep.evalButton.show();
     ep.evalButton.click(function () {
      ep.performEval();
     });
-  } else {
-    ep.evalButton.hide();
   }
+  /*
   if (k == lib.Let) {
     ep.expandButton.show();
     ep.expandButton.click(function () {
@@ -754,6 +819,7 @@ lib.popEditPanel = function (trm) {
   } else {
     ep.expandButton.hide();
   }
+  */
   ep.cancelButton.click(lib.deactivateEditPanel);
 
   ep.term = trm;
@@ -765,17 +831,17 @@ lib.popEditPanel = function (trm) {
   ep.stage = stg;
   var sjq = lib.stages[stg].containerJQ;
   sjq.after(ep.containerJQ);
-  ep.replaceButton.click(function () {
-    ep.performReplace();
-  });
  
-  //lib.container.append(ep.containerJQ);
+ 
+  lib.container.append(ep.containerJQ);
+  ep.installCallbacks();
   var ps = trm.offset();
   var cps = lib.jqToPoint(lib.container.offset());
   var aps = ps.minus(cps);  
   //lib.theEditPanel.jq.css({'top':aps.y,'left':aps.x});
   ep.jq.css("left",aps.x);
-  lib.theEditPanel.x = aps.x;
+  ep.x = aps.x;
+  lib.theEditPanel = ep;
  // lib.positionLines(); // push down the lines below the editpanel
 }
   
@@ -795,7 +861,8 @@ lib.popEditPanel = function (trm) {
     buttons.append(b);
     b.click(lib.topEval);
    
-    lib.buildEditPanel();
+    lib.buildEditPanel(lib.types.any);
+    lib.buildColorEditPanel(lib.types.color);
   }
 
 
